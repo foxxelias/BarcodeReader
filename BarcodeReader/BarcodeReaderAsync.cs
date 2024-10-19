@@ -3,19 +3,14 @@ using System.Text;
 
 namespace BarcodeReader;
 
-public class BarcodeReaderAsync : BaseBarcodeReader, IAsyncBarcodeReader
+public class BarcodeReaderAsync(string devicePath, int timeoutMs)
+    : BaseBarcodeReader(devicePath, timeoutMs), IAsyncBarcodeReader
 {
-    private readonly StringBuilder _barcode;
+    private readonly StringBuilder _barcode = new(26);
     private readonly object _lock = new();
-    private CancellationTokenSource _cancellationTokenSource;
-    private Task _readTask; // Переменная для хранения задачи чтения
-    private Timer _timer;
-
-    public BarcodeReaderAsync(string devicePath, int timeoutMs) : base(devicePath, timeoutMs)
-    {
-        _cancellationTokenSource = new CancellationTokenSource();
-        _barcode = new StringBuilder(26);
-    }
+    private CancellationTokenSource _cancellationTokenSource = new();
+    private Task? _readTask; // Переменная для хранения задачи чтения
+    private Timer? _timer;
 
     public async Task StartAsync()
     {
@@ -25,18 +20,13 @@ public class BarcodeReaderAsync : BaseBarcodeReader, IAsyncBarcodeReader
             TaskCreationOptions.LongRunning);
     }
 
-    public override void Stop()
+    public async Task Stop()
     {
-        _cancellationTokenSource.Cancel();
+        await _cancellationTokenSource.CancelAsync();
         StopTimer();
-        _readTask?.Wait(); // Ждать завершения задачи чтения, если запущена
+        await _readTask; // Ждать завершения задачи чтения, если запущена
         _cancellationTokenSource.Dispose(); // Освободить ресурсы
         _cancellationTokenSource = new CancellationTokenSource(); // Создать новый токен для следующего запуска
-    }
-
-    public override void Start()
-    {
-        StartAsync().GetAwaiter().GetResult(); // Можно добавить возможность синхронного вызова
     }
 
     private async Task ReadBarcodeAsync(CancellationToken token)

@@ -14,9 +14,6 @@ public abstract class BaseBarcodeReader : IBarcodeReader
     public event IBarcodeReader.BarcodeScannedEventHandler BarcodeScanned;
     public event IBarcodeReader.IoErrorEventHandler IOError;
 
-    public abstract void Start();
-    public abstract void Stop();
-
     protected void RaiseBarcodeScanned(string barcode)
     {
         BarcodeScanned?.Invoke(this, barcode);

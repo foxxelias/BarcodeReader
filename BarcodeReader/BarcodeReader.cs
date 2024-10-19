@@ -2,7 +2,7 @@
 
 namespace BarcodeReader;
 
-public class BarcodeReader : BaseBarcodeReader
+public class BarcodeReader : BaseBarcodeReader, ISyncBarcodeReader
 {
     private readonly StringBuilder _barcode;
     private readonly CancellationTokenSource _cancellationTokenSource;
@@ -15,12 +15,12 @@ public class BarcodeReader : BaseBarcodeReader
     }
 
 
-    public override void Start()
+    public void Start()
     {
         throw new NotImplementedException();
     }
 
-    public override void Stop()
+    public void Stop()
     {
         throw new NotImplementedException();
     }
